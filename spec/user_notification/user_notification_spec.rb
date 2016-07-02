@@ -1,0 +1,42 @@
+require 'rails_helper'
+
+describe UserNotification do
+  describe "When module is included" do
+    subject { OrderWithIncludedUserNotificationModule.new }
+
+    it 'should have empty notifiers' do
+      class_name = subject.class.name
+      expect(subject.class.notifiers[class_name]).to eq([])
+    end
+  end
+
+  describe ".add_notifier" do
+    context "When no block is given" do
+      subject { OrderWithEmailNotifier.new }
+
+      it 'should add default email notifier' do
+        class_name = subject.class.name
+        expect(subject.class.notifiers[class_name]).to eq([UserNotification::Notifiers::EmailNotifier.instance])
+      end
+    end
+  end
+
+  describe "#notifiers" do
+    subject { OrderWithEmailNotifier.new }
+    it 'should return all available notifiers' do
+      expect(subject.notifiers.size).to eq 1
+      expect(subject.notifiers.first).to eq UserNotification::Notifiers::EmailNotifier.instance
+    end
+  end
+
+  describe "#notify" do
+    subject { OrderWithEmailNotifier.new }
+    before { expect(subject.notifiers.size).to eq 1 }
+
+    it 'should call #notify an all availble notifiers' do
+      user = double('User')
+      expect(UserNotification::Notifiers::EmailNotifier.instance).to receive(:notify).with(:a_template, user)
+      subject.notify(:a_template, user)
+    end
+  end
+end
