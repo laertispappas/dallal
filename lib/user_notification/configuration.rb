@@ -16,7 +16,7 @@ module UserNotification
       yield config if block_given?
     end
 
-    def confguration
+    def configuration
       config
     end
 

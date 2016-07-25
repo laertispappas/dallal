@@ -26,7 +26,7 @@ describe UserNotification::Configuration do
       end
 
       it 'should have set confg attributes correctly' do
-        expect(subject.confguration.user_class_name).to eq 'UserClassName'
+        expect(subject.configuration.user_class_name).to eq 'UserClassName'
       end
     end
   end
