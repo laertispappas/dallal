@@ -35,8 +35,12 @@ describe UserNotification do
 
     it 'should call #notify an all availble notifiers' do
       user = double('User')
-      expect(UserNotification::Notifiers::EmailNotifier.instance).to receive(:notify).with(:a_template, user)
+      expect(UserNotification::Notifiers::EmailNotifier.instance).to receive(:notify).with(:a_template, user).and_call_original
       subject.notify(:a_template, user)
+    end
+
+    context "when more than one notifiers exist" do
+      pending
     end
   end
 end

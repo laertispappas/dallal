@@ -22,13 +22,27 @@ module UserNotification
       unless block_given?
         add_default_notifier
       else
-        raise NotImplementedError
+        instance_eval(&block)
       end
     end
 
     private
     def add_default_notifier
-      notifiers[self.name] << UserNotification::Notifiers::EmailNotifier.instance
+      email
+    end
+
+    def sms
+      unless self.notifiers[self.name].include?(@__sms_notifier)
+        @__sms_notifier ||= UserNotification::Notifiers::Notifier.sms
+        self.notifiers[self.name] << @__sms_notifier
+      end
+    end
+
+    def email
+      unless self.notifiers[self.name].include?(@__email_notifier)
+        @__email_notifier ||= UserNotification::Notifiers::Notifier.email
+        self.notifiers[self.name] << @__email_notifier
+      end
     end
   end
 

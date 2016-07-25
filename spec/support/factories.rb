@@ -7,3 +7,7 @@ end
 class OrderWithIncludedUserNotificationModule
   include UserNotification
 end
+
+class OrderWithEmailAndSmsNotifier
+  include UserNotification
+end

@@ -1,9 +1,7 @@
-require 'singleton'
 
 module UserNotification
   module Notifiers
-    class EmailNotifier < Notifier
-      include Singleton
+    class SmsNotifier < Notifier
 
       def notify(template, user, *args)
         #options = args.extract_options!

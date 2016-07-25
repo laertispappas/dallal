@@ -21,7 +21,7 @@ module UserNotification
       def needs_implementation(name, *args)
         self.class_eval do
           define_method(name) do |*args|
-            raise NotImiplemented
+            raise NotImplemented
           end
         end
       end
