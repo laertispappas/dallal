@@ -1,2 +1,2 @@
-class UserNotification
+class UserNotification < ActiveRecord::Based
 end

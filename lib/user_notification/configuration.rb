@@ -2,7 +2,7 @@ require 'ostruct'
 
 module UserNotification
   module Configuration
-    CURRENT_ATTRS = [:user_class_name].freeze
+    CURRENT_ATTRS = [:user_class_name, :user_notification_class_name].freeze
     DEPRECATED_ATTRS = [].freeze
     CONFIG_ATTRS = (CURRENT_ATTRS + DEPRECATED_ATTRS).freeze
 
@@ -38,6 +38,7 @@ module UserNotification
       private
       def set_default_values
         self.user_class_name = 'User'
+        self.user_notification_class_name = 'UserNotification'
       end
     end
   end
