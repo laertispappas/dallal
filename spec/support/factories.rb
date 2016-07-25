@@ -1,3 +1,9 @@
+class User
+  include UserNotification
+
+  #receives_notifications if: :applicable?
+end
+
 class OrderWithEmailNotifier
   include UserNotification
 

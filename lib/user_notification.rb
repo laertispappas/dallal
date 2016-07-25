@@ -2,6 +2,7 @@ require "user_notification/engine"
 require 'user_notification/configuration'
 require 'user_notification/notifiers/notifier'
 
+
 module UserNotification
   extend Configuration
 
