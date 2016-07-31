@@ -6,7 +6,6 @@ module UserNotification
       include Singleton
 
       def notify(template, user, *args)
-        #options = args.extract_options!
       end
     end
   end

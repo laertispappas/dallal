@@ -1,44 +1,24 @@
-require "user_notification/engine"
-require 'user_notification/configuration'
+require "user_notification/engine" if defined?(Rails)
+require 'user_notification/notification'
 require 'user_notification/notifiers/notifier'
-
+require 'user_notification/events/events'
+require 'user_notification/notifiable'
+require 'user_notification/configuration'
 
 module UserNotification
   extend Configuration
-
+  # Add here include Notifiable and move all methods below to
+  # Notifiable Module
 
   def self.included(base)
     base.include(InstanceMethods)
     base.extend(ClassMethods)
+
+    # Notifiable module for Pub events
+    base.include(UserNotification::Notifiable)
   end
 
   module ClassMethods
-    def notifiers
-      @notifiers ||= {}
-    end
-
-    def add_notifier(&block)
-      if block_given?
-        instance_eval(&block)
-      else
-        add_default_notifier
-      end
-    end
-
-    private
-    def add_default_notifier
-      email
-    end
-
-    def sms
-      @__sms_notifier ||= UserNotification::Notifiers::Notifer.sms
-      self.notifiers[:sms] ||= @__sms_notifier
-    end
-
-    def email
-      @__email_notifier ||= UserNotification::Notifiers::Notifier.email
-      self.notifiers[:email] ||= @__email_notifier
-    end
   end
 
   module InstanceMethods

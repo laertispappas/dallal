@@ -1,6 +1,10 @@
 require 'rails_helper'
 
 describe UserNotification do
+  subject { OrderWithIncludedUserNotificationModule.new }
+
+  it { expect(subject).to be_a UserNotification::Notifiable}
+
   describe "When module is included" do
     subject { OrderWithIncludedUserNotificationModule.new }
 

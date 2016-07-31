@@ -3,6 +3,7 @@ module UserNotification
     isolate_namespace UserNotification
     
     initializer "Include UserNotification after rails boot" do
+      # ...
       require 'user_notification/file_loader'
 
       # Run before every request in dev and before the first request in production

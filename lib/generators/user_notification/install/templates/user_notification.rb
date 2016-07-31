@@ -5,6 +5,9 @@ UserNotification.configure do |config|
   # Set up user notification class name
   config.user_notification_class_name = 'UserNotification'
 
+  # Enable / Disable notifications globaly
+  config.enabled = true
+
   # 
   # config.available_notifications = [:email]
 

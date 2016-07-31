@@ -9,7 +9,6 @@ require 'spec_helper'
 require 'rspec/rails'
 require 'factory_girl_rails'
 
-
 Dir["#{File.dirname(__FILE__)}/support/**/*.rb"].each { |f| require f }
 
 ActiveRecord::Migration.maintain_test_schema!

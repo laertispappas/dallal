@@ -1,0 +1,5 @@
+require 'user_notification/events/subscriber'
+require 'user_notification/events/publisher'
+require 'user_notification/events/event_publisher'
+require 'user_notification/events/event_subscriber'
+require 'user_notification/events/observer'
