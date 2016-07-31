@@ -10,8 +10,6 @@ module UserNotification
   def self.included(base)
     base.include(InstanceMethods)
     base.extend(ClassMethods)
-    
-    base.notifiers[base.name] ||= []
   end
 
   module ClassMethods
@@ -20,10 +18,10 @@ module UserNotification
     end
 
     def add_notifier(&block)
-      unless block_given?
-        add_default_notifier
-      else
+      if block_given?
         instance_eval(&block)
+      else
+        add_default_notifier
       end
     end
 
@@ -33,27 +31,23 @@ module UserNotification
     end
 
     def sms
-      unless self.notifiers[self.name].include?(@__sms_notifier)
-        @__sms_notifier ||= UserNotification::Notifiers::Notifier.sms
-        self.notifiers[self.name] << @__sms_notifier
-      end
+      @__sms_notifier ||= UserNotification::Notifiers::Notifer.sms
+      self.notifiers[:sms] ||= @__sms_notifier
     end
 
     def email
-      unless self.notifiers[self.name].include?(@__email_notifier)
-        @__email_notifier ||= UserNotification::Notifiers::Notifier.email
-        self.notifiers[self.name] << @__email_notifier
-      end
+      @__email_notifier ||= UserNotification::Notifiers::Notifier.email
+      self.notifiers[:email] ||= @__email_notifier
     end
   end
 
   module InstanceMethods
     def notifiers
-      self.class.notifiers[self.class.name]
+      self.class.notifiers
     end
 
     def notify(template, user)
-      notifiers.each do |notifier|
+      notifiers.each do |_, notifier|
         notifier.notify(template, user)
       end
     end

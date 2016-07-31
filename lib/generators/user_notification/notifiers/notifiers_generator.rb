@@ -9,7 +9,7 @@ module UserNotification
         migration_template "#{notifier_name}_notifier_migration.rb", "db/migrate/create_#{notifier_name}_notifiers.rb"
       end
 
-      # TODO Refactor and DRY this or better DRY 3 step generation process into 1 or 2. 
+      # TODO Refactor and DRY this or better DRY 3 step generation process into 1 or 2.
       def copy_files
         copy_file "#{notifier_name}_notifier.rb", model_path
 

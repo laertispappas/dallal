@@ -40,7 +40,8 @@ describe UserNotification::Configuration do
 
     it 'should return all options' do
       expect(subject.options).to eq({
-        user_class_name: 'UserClass'
+        user_class_name: 'UserClass',
+        user_notification_class_name: 'UserNotification'
       })
     end
   end

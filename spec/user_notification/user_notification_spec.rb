@@ -6,7 +6,7 @@ describe UserNotification do
 
     it 'should have empty notifiers' do
       class_name = subject.class.name
-      expect(subject.class.notifiers[class_name]).to eq([])
+      expect(subject.class.notifiers).to be_empty
     end
   end
 
@@ -15,8 +15,8 @@ describe UserNotification do
       subject { OrderWithEmailNotifier.new }
 
       it 'should add default email notifier' do
-        class_name = subject.class.name
-        expect(subject.class.notifiers[class_name]).to eq([UserNotification::Notifiers::EmailNotifier.instance])
+        expect(subject.class.notifiers.size).to eq 1
+        expect(subject.class.notifiers[:email]).to eq(UserNotification::Notifiers::EmailNotifier.instance)
       end
     end
   end
@@ -25,7 +25,7 @@ describe UserNotification do
     subject { OrderWithEmailNotifier.new }
     it 'should return all available notifiers' do
       expect(subject.notifiers.size).to eq 1
-      expect(subject.notifiers.first).to eq UserNotification::Notifiers::EmailNotifier.instance
+      expect(subject.notifiers[:email]).to eq UserNotification::Notifiers::EmailNotifier.instance
     end
   end
 
