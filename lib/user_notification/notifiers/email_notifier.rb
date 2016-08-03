@@ -7,6 +7,9 @@ module UserNotification
 
       def notify(template, user, *args)
       end
+
+      def mailer
+      end
     end
   end
 end

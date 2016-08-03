@@ -43,6 +43,7 @@ describe UserNotification::Configuration do
         user_class_name: 'UserClass',
         user_notification_class_name: 'UserNotification',
         enabled: true,
+        email_layout: 'mailer'
       })
     end
   end
