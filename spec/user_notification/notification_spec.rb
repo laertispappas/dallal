@@ -46,7 +46,7 @@ describe UserNotification::Notification do
         end
         expect(executed).to be true
         expect(subject.instance_variable_get(:@template)).to eq :an_email_template
-        expect(subject.instance_variable_get(:@notifiers)[:email]).to eq UserNotification::Notifiers::Notifier.email
+        expect(subject.instance_variable_get(:@notifiers)[:email]).to be_a(UserNotification::Notifiers::EmailNotifier)
         expect(subject.instance_variable_get(:@target)).to eq([@user])
       end
 
@@ -72,7 +72,7 @@ describe UserNotification::Notification do
             payload a: 1, b: 2
           end
         end
-        expect(subject.instance_variable_get(:@notifiers)[:email]).to eq(UserNotification::Notifiers::Notifier.email)
+        expect(subject.instance_variable_get(:@notifiers)[:email]).to be_a(UserNotification::Notifiers::EmailNotifier)
         expect(subject.instance_variable_get(:@template)).to eq :email_template
         expect(subject.instance_variable_get(:@payload)).to eq(a: 1, b: 2)
         expect(subject.instance_variable_get(:@notifiers)[:sms]).to be_a(UserNotification::Notifiers::SmsNotifier)
@@ -105,8 +105,12 @@ describe UserNotification::Notification do
         expect(subject.dispatch!).to eq return_value
       end
     end
-    context 'single email notification'
-    context 'multiple notifications'
+    context 'single email notification' do
+      pending
+    end
+    context 'multiple notifications' do
+      pending
+    end
   end
 
   describe 'persist?' do

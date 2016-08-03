@@ -3,14 +3,19 @@ require 'user_notification/abstract_interface'
 module UserNotification
   module Notifiers
     class Notifier
-      include AbstractInterface
+      attr_reader :notification
 
-      def self.email
-        UserNotification::Notifiers::EmailNotifier.instance
+      include AbstractInterface
+      def initialize(notification)
+        @notification = notification
+      end
+
+      def self.email(notification)
+        UserNotification::Notifiers::EmailNotifier.new(notification)
       end
   
-      def self.sms
-        UserNotification::Notifiers::SmsNotifier.new
+      def self.sms(notification)
+        UserNotification::Notifiers::SmsNotifier.new(notification)
       end
 
       def notify(*args)

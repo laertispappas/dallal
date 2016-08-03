@@ -40,8 +40,10 @@ module UserNotification
 
     # TODO Rethink this. Not all notifiers have push functionality
     def dispatch!
-      # @notifiers.each { |_, n| n.notify(self) }
       validate!
+      # @notifiers.each { |_, n| n.notify }
+      # @notifiers.each { |_, n| n.persist! }
+      #
       push!
       save!
     end
@@ -74,7 +76,7 @@ module UserNotification
 
 
     def get_notifier(name)
-      UserNotification::Notifiers::Notifier.send(name)
+      UserNotification::Notifiers::Notifier.send(name, self)
     end
 
     def should_send?(condition)
