@@ -5,7 +5,7 @@ describe UserNotification::Events::EventSubscriber do
   let(:payload) { { a: 1, b: 2 } }
   let(:user) { FactoryGirl.build(:user) }
   
-  before { allow(user).to receive(:id).and_return(-1) }
+  before { allow(user).to receive(:id).and_return(12) }
 
   context 'when a create event is broadcasted' do
     it 'creates a new instance and exeutes' do

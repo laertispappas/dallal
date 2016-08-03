@@ -21,6 +21,8 @@ module UserNotification
       end
 
       def self.create_notification(id:, event:)
+        # TODO This loops on all callbacks. Rethink this
+        # method and implement it differently. Add listeners?
         callbacks.each do |callback|
           next unless callback[:on].include?(event)
           obj = model_class.constantize.find(id)
@@ -35,7 +37,7 @@ module UserNotification
 
 
       private
-      
+
       def self.model_class
         self.name.gsub('Notifier', '')
       end
