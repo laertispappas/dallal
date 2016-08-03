@@ -2,8 +2,8 @@ require "user_notification/engine" if defined?(Rails)
 require 'user_notification/notification'
 require 'user_notification/notifiers/notifier'
 require 'user_notification/events/events'
-require 'user_notification/notifiable'
 require 'user_notification/configuration'
+require 'user_notification/events/event_publisher'
 
 module UserNotification
   extend Configuration
@@ -13,23 +13,29 @@ module UserNotification
   def self.included(base)
     base.include(InstanceMethods)
     base.extend(ClassMethods)
+    
+    base.class_eval do
+      include UserNotification::Events::Publisher
 
-    # Notifiable module for Pub events
-    base.include(UserNotification::Notifiable)
+      after_create :publish_notification_created
+      after_update :publish_notification_updated
+    end
   end
 
   module ClassMethods
   end
 
   module InstanceMethods
-    def notifiers
-      self.class.notifiers
+    def publish_notification_created
+      UserNotification::Events::EventPublisher.broadcast({
+        class: self.class.name, id: self.id, event: :create
+      })
     end
 
-    def notify(template, user)
-      notifiers.each do |_, notifier|
-        notifier.notify(template, user)
-      end
+    def publish_notification_updated
+      UserNotification::Events::EventPublisher.broadcast({
+        class: self.class.name, id: self.id, event: :update
+      })
     end
   end
 end

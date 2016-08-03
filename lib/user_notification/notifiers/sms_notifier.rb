@@ -3,7 +3,7 @@ module UserNotification
   module Notifiers
     class SmsNotifier < Notifier
 
-      def notify(template, user, *args)
+      def notify(notification)
       end
     end
   end

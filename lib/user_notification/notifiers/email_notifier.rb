@@ -5,10 +5,17 @@ module UserNotification
     class EmailNotifier < Notifier
       include Singleton
 
-      def notify(template, user, *args)
+      def notify(notification)
       end
 
       def mailer
+        UserNotification::Mailer
+      end
+
+      def deliver
+      end
+
+      def deliver!
       end
     end
   end

@@ -1,7 +1,6 @@
 module UserNotification
   class Notification
     attr_accessor :event, :model_class, :opts, :_object
-    attr_reader :template
 
     def initialize args = {}
       args.each do |k, v|
@@ -41,6 +40,7 @@ module UserNotification
 
     # TODO Rethink this. Not all notifiers have push functionality
     def dispatch!
+      # @notifiers.each { |_, n| n.notify(self) }
       validate!
       push!
       save!
