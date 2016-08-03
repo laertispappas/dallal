@@ -2,8 +2,8 @@ require 'ostruct'
 
 module UserNotification
   module Configuration
-    CURRENT_ATTRS = [:user_class_name, :user_notification_class_name, 
-                     :enabled, :email_layout].freeze
+    CURRENT_ATTRS = [:user_class_name, :user_notification_class_name,
+                     :enabled, :email_layout, :from_email, :from_name].freeze
     DEPRECATED_ATTRS = [].freeze
     CONFIG_ATTRS = (CURRENT_ATTRS + DEPRECATED_ATTRS).freeze
 
@@ -46,6 +46,8 @@ module UserNotification
         self.user_notification_class_name = 'UserNotification'
         self.enabled = true
         self.email_layout = 'mailer'
+        self.from_email = 'foo@bar.xyz'
+        self.from_name = 'just a name'
       end
     end
   end

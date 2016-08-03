@@ -45,7 +45,7 @@ describe UserNotification::Notification do
           end
         end
         expect(executed).to be true
-        expect(subject.instance_variable_get(:@template)).to eq :an_email_template
+        expect(subject.instance_variable_get(:@template_name)).to eq :an_email_template
         expect(subject.instance_variable_get(:@notifiers)[:email]).to be_a(UserNotification::Notifiers::EmailNotifier)
         expect(subject.instance_variable_get(:@target)).to eq([@user])
       end
@@ -73,7 +73,7 @@ describe UserNotification::Notification do
           end
         end
         expect(subject.instance_variable_get(:@notifiers)[:email]).to be_a(UserNotification::Notifiers::EmailNotifier)
-        expect(subject.instance_variable_get(:@template)).to eq :email_template
+        expect(subject.instance_variable_get(:@template_name)).to eq :email_template
         expect(subject.instance_variable_get(:@payload)).to eq(a: 1, b: 2)
         expect(subject.instance_variable_get(:@notifiers)[:sms]).to be_a(UserNotification::Notifiers::SmsNotifier)
       end
@@ -89,8 +89,8 @@ describe UserNotification::Notification do
             template :a
           end
         end
-        expect(subject.instance_variable_get(:@notifiers)[:sms]).to_not receive(:notify!)
-        expect(subject.instance_variable_get(:@notifiers)[:sms]).to_not receive(:persist!)
+        expect(subject.instance_variable_get(:@notifiers)[:sms]).to be nil
+        expect(subject.instance_variable_get(:@notifiers)[:sms]).to be nil
         expect(subject.instance_variable_get(:@notifiers)[:email]).to receive(:notify!)
         expect(subject.instance_variable_get(:@notifiers)[:email]).to_not receive(:persist!)
 

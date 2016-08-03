@@ -1,6 +1,7 @@
 module UserNotification
   class Notification
     attr_accessor :event, :model_class, :opts, :_object
+    attr_reader :template_name
 
     def initialize args = {}
       args.each do |k, v|
@@ -23,7 +24,11 @@ module UserNotification
       end
     end
 
-    # TODO !!! Watch out same payload for multiple notifers that 
+    def user
+      @target.first
+    end
+
+    # TODO !!! Watch out same payload for multiple notifers that
     # require payload
     def payload payload
       @payload = payload
@@ -31,14 +36,13 @@ module UserNotification
 
     # Same here as payload
     def template template
-      @template = template
+      @template_name = template
     end
 
     def persist?
       opts[:persist].present?
     end
 
-    # TODO Rethink this. Not all notifiers have push functionality
     def dispatch!
       validate!
       @notifiers.each { |_, n| n.notify! }
@@ -58,6 +62,7 @@ module UserNotification
     end
 
     def get_notifier(name)
+      # TODO Pass concrete notifications to notifiers. Ex, EmailNotification, JsonPayloadNotification, SmsNotification ...
       UserNotification::Notifiers::Notifier.send(name, self)
     end
 
