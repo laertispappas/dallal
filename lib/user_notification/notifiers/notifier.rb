@@ -18,7 +18,11 @@ module UserNotification
         UserNotification::Notifiers::SmsNotifier.new(notification)
       end
 
-      def notify(*args)
+      def notify!(*args)
+        Notifier.api_not_implemented(self)
+      end
+
+      def persist!
         Notifier.api_not_implemented(self)
       end
     end

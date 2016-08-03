@@ -41,11 +41,8 @@ module UserNotification
     # TODO Rethink this. Not all notifiers have push functionality
     def dispatch!
       validate!
-      # @notifiers.each { |_, n| n.notify }
-      # @notifiers.each { |_, n| n.persist! }
-      #
-      push!
-      save!
+      @notifiers.each { |_, n| n.notify! }
+      @notifiers.each { |_, n| n.persist! } if persist?
     end
 
     private
@@ -59,21 +56,6 @@ module UserNotification
         raise "You have not defined \'notify\' in \'with\' block for #{class_name} notifier"
       end
     end
-
-    def push!
-      # Push to remote
-      # Send email
-      # Send with action cable
-      # Send sms
-      # Send to aws ....
-    end
-
-    def save!
-      if persist?
-        # Create notifications here
-      end
-    end
-
 
     def get_notifier(name)
       UserNotification::Notifiers::Notifier.send(name, self)

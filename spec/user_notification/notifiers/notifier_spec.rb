@@ -21,7 +21,7 @@ describe UserNotification::Notifiers::Notifier do
   end
   describe "#notify" do
     it 'should raise an error' do
-      expect{ subject.notify }.to raise_error(UserNotification::AbstractInterface::InterfaceNotImplementedError)
+      expect{ subject.notify! }.to raise_error(UserNotification::AbstractInterface::InterfaceNotImplementedError)
     end
   end
 end

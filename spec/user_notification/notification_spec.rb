@@ -82,27 +82,19 @@ describe UserNotification::Notification do
 
   describe 'dispatch!' do
     subject { UserNotification::Notification.new(event: :create, model_class: 'Post', opts: { a: 1 }, _object: @post) }
-    context 'single sms notification' do
-      it 'does not push or saves the record when object is not valid' do
-        expect(subject).to_not receive(:push!)
-        expect(subject).to_not receive(:save!)
-        expect(subject).to receive(:validate!).and_raise ArgumentError
-        expect { subject.dispatch! }.to raise_error(ArgumentError)
-      end
+    context 'single email notification with no persistance' do
+      it 'sends the notification through email notifier' do
+        subject.notify @user do
+          with :email do
+            template :a
+          end
+        end
+        expect(subject.instance_variable_get(:@notifiers)[:sms]).to_not receive(:notify!)
+        expect(subject.instance_variable_get(:@notifiers)[:sms]).to_not receive(:persist!)
+        expect(subject.instance_variable_get(:@notifiers)[:email]).to receive(:notify!)
+        expect(subject.instance_variable_get(:@notifiers)[:email]).to_not receive(:persist!)
 
-      it 'does not save the record whe push! failes' do
-        expect(subject).to receive(:validate!)
-        expect(subject).to receive(:push!).and_raise ArgumentError
-        expect(subject).to_not receive(:save!)
-        expect{subject.dispatch!}.to raise_error(ArgumentError)
-      end
-
-      it 'saves the notification when push succeeds' do
-        return_value = double("SaveReturn")
-        expect(subject).to receive(:validate!)
-        expect(subject).to receive(:push!)
-        expect(subject).to receive(:save!).and_return(return_value)
-        expect(subject.dispatch!).to eq return_value
+        subject.dispatch!
       end
     end
     context 'single email notification' do

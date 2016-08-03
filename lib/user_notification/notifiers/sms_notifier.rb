@@ -3,7 +3,12 @@ module UserNotification
   module Notifiers
     class SmsNotifier < Notifier
 
-      def notify(notification)
+      def notify!
+      end
+
+
+      def persist!
+
       end
     end
   end
