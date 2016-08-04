@@ -24,6 +24,7 @@ module Dallal
       end
     end
 
+    # TODO fix this. This is a quick and dirty patch for email
     def user
       @target.first
     end
@@ -43,6 +44,7 @@ module Dallal
       opts[:persist].present?
     end
 
+    # TODO Add support for multiple targets
     def dispatch!
       validate!
       @notifiers.each { |_, n| n.notify! }
