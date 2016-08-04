@@ -11,13 +11,18 @@ module Dallal
       @notifiers = {}
     end
 
-    def notify target, &block
-      @target = Array(target).flatten.compact.uniq
+    # TODO Collection of targets is not supported
+    def notify *args, &block
+      notify_opts = args.extract_options!
+      return unless should_send?(notify_opts[:if])
+
+      @target = Array(args).flatten.compact.uniq
       instance_eval(&block)
     end
 
     def with *args, &block
       opts = args.extract_options!
+      # TODO Move if condition to notify method
       if should_send?(opts[:if])
         instance_eval(&block)
         args.each { |arg| @notifiers[arg] = get_notifier(arg) }
@@ -72,7 +77,7 @@ module Dallal
       return true if condition.blank?
 
       if condition.is_a?(Proc)
-        _object.instance_exec(&condition)
+        instance_exec(&condition)
       else
         _object.send(condition)
       end

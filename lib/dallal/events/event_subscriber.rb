@@ -14,7 +14,6 @@ module Dallal
 
       def execute
         if should_create_notifications?
-          # Trigger an ActiJob for this notification
           DallalJob.perform_later payload[:class], payload[:id], payload[:event].to_s
         end
       end

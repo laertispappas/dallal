@@ -26,6 +26,7 @@ describe Dallal::Notification do
     subject do
       Dallal::Notification.new(event: :create, model_class: 'Post', opts: { a: 1 }, _object: @post)
     end
+
     it 'should get the target(s) and call the block' do
       executed = false
       subject.notify(@user) do
@@ -61,7 +62,41 @@ describe Dallal::Notification do
         expect(subject.instance_variable_get(:@target)).to eq([@user])
         expect(subject.instance_variable_get(:@notifiers)[:sms]).to be_a(Dallal::Notifiers::SmsNotifier)
       end
+
+      it 'evaluates correctly when an if lambda returns true' do
+        subject.define_singleton_method('post') do
+          @post
+        end
+        allow(subject).to receive(:post).and_return(@post)
+
+        subject.notify(@user, if: -> (){ post.id.present?} ) do
+          with :email do
+            template :an_email_template
+          end
+        end
+        expect(subject.instance_variable_get(:@template_name)).to eq :an_email_template
+        expect(subject.instance_variable_get(:@notifiers)[:email]).to be_a(Dallal::Notifiers::EmailNotifier)
+        expect(subject.instance_variable_get(:@target)).to eq([@user])
+      end
+
+      it 'does not call the block when if lambda evaluates to false' do
+        subject.define_singleton_method('post') do
+          @post
+        end
+        allow(subject).to receive(:post).and_return(@post)
+
+        subject.notify(@user, if: -> (){ post.id == -100} ) do
+          raise "BLock should not be executed"
+          with :email do
+            template :an_email_template
+          end
+        end
+        expect(subject.instance_variable_get(:@template_name)).to eq nil
+        expect(subject.instance_variable_get(:@notifiers)[:email]).to eq nil
+        expect(subject.instance_variable_get(:@target)).to eq nil
+      end
     end
+
     context "multiple notifiers" do
       it '' do
         subject.notify(@user) do
@@ -126,6 +161,17 @@ describe Dallal::Notification do
   end
 
   describe '#should_send?' do
+    subject do
+      Dallal::Notification.new(event: :create, model_class: 'Post', opts: { a: 1 }, _object: @post)
+    end
+    before do
+      subject.define_singleton_method('post') do
+        @post
+      end
+      allow(subject).to receive(:post).and_return(@post)
+    end
+
+
     it 'return true on blank values' do
       [nil, false, ''].each do |val|
         expect(subject.send(:should_send?, val)).to be true
@@ -140,12 +186,11 @@ describe Dallal::Notification do
     end
 
     it 'evaluates a proc to object instance' do
-      _proc = -> () { a_method }
+      _proc = ->(){ post.id.present? }
 
-      subject._object = double("SomeObject")
       result = double("Result")
 
-      expect(subject._object).to receive(:a_method).and_return(result)
+      expect(subject.post).to receive_message_chain(:id, :present?).and_return(result)
       expect(subject.send(:should_send?, _proc)).to eq result
     end
   end
