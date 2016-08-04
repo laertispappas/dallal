@@ -1,2 +1,2 @@
-class UserNotifier < UserNotification::Events::Observer
+class UserNotifier < Dallal::Events::Observer
 end

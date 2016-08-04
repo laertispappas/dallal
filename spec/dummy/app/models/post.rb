@@ -1,4 +1,4 @@
 class Post < ActiveRecord::Base
-  include UserNotification
+  include Dallal
   belongs_to :user
 end

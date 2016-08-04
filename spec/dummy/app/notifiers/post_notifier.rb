@@ -1,4 +1,4 @@
-class PostNotifier < UserNotification::Events::Observer
+class PostNotifier < Dallal::Events::Observer
   on :create do
     notify post.user do
       with :email, if: nil do

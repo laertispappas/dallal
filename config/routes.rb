@@ -1,2 +1,2 @@
-UserNotification::Engine.routes.draw do
+Dallal::Engine.routes.draw do
 end

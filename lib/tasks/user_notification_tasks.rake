@@ -1,4 +1,4 @@
 # desc "Explaining what the task does"
-# task :user_notification do
+# task :dallal do
 #   # Task goes here
 # end

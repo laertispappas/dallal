@@ -1,4 +1,4 @@
 class User < ActiveRecord::Base
-  include UserNotification
+  include Dallal
   has_many :posts
 end

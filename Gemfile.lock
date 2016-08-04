@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    user_notification (0.0.1)
+    dallal (0.0.1)
       rails (~> 4.2.0)
 
 GEM
@@ -142,10 +142,10 @@ PLATFORMS
 
 DEPENDENCIES
   capybara
+  dallal!
   factory_girl_rails
   rspec-rails
   sqlite3
-  user_notification!
 
 BUNDLED WITH
    1.12.5

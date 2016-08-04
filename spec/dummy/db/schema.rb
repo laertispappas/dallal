@@ -23,7 +23,7 @@ ActiveRecord::Schema.define(version: 20160803174036) do
 
   add_index "posts", ["user_id"], name: "index_posts_on_user_id"
 
-  create_table "user_notification_products", force: :cascade do |t|
+  create_table "dallal_products", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end

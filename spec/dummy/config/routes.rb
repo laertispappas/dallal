@@ -1,4 +1,4 @@
 Rails.application.routes.draw do
 
-  mount UserNotification::Engine => "/user_notification"
+  mount Dallal::Engine => "/dallal"
 end
