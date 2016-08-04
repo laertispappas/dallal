@@ -7,7 +7,7 @@ module Dallal
       require 'dallal/file_loader'
 
       # Run before every request in dev and before the first request in production
-      ActionDispatch::Callbacks.to_prepare do
+      ActiveSupport::Reloader.to_prepare do
         Dallal::FileLoader.load_notifiers
       end
     end

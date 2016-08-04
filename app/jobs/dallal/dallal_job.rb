@@ -1,5 +1,5 @@
 module Dallal
-  class DallalJob < ActiveJob::Base
+  class DallalJob < ApplicationJob
     queue_as :default
 
     # TODO This is tricky. Event is string here. Is transformed in
