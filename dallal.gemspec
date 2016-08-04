@@ -9,9 +9,9 @@ Gem::Specification.new do |s|
   s.version     = Dallal::VERSION
   s.authors     = ["Laertis Pappas"]
   s.email       = ["laertis.pappas@gmail.com"]
-  s.homepage    = "http://github.com/laertispappas"
-  s.summary     = "Summary of Dallal."
-  s.description = "Description of Dallal."
+  s.homepage    = "https://github.com/laertispappas/dallal"
+  s.summary     = "A Rails engine to add any kind of notification to your app. Currently supports only email notification."
+  s.description = "Dallas provides a DSL that allows you to define and create notifications for any kind of target. Currently it supports only create and update actions of a resource and only email notifications."
   s.license     = "MIT"
 
   s.files = Dir["{app,config,db,lib}/**/*", "MIT-LICENSE", "Rakefile", "README.rdoc"]
