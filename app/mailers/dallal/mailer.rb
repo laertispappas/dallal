@@ -13,7 +13,7 @@ module Dallal
       {
         from: address_format(@notification.from_email, @notification.from_name),
         reply_to: address_format(@notification.from_email, @notification.from_name),
-        to: @notification.user.email,
+        to: @notification.target.email,
         cc: nil,
         subject: subject,
         template_name: "#{object_plural_name}/#{@notification.template_name}"

@@ -1,3 +1,6 @@
+require 'dallal/notifications/email_notification'
+require 'dallal/notifications/sms_notification'
+
 module Dallal
   class Notification
     attr_accessor :event, :model_class, :opts, :_object
@@ -8,7 +11,7 @@ module Dallal
         send("#{k}=", v)
       end
 
-      @notifiers = {}
+      @notifiers = []
     end
 
     # TODO Collection of targets is not supported
@@ -16,22 +19,21 @@ module Dallal
       notify_opts = args.extract_options!
       return unless should_send?(notify_opts[:if])
 
-      @target = Array(args).flatten.compact.uniq
+      @targets = Array(args).flatten.compact.uniq
       instance_eval(&block)
     end
 
     def with *args, &block
       opts = args.extract_options!
-      # TODO Move if condition to notify method
-      if should_send?(opts[:if])
-        instance_eval(&block)
-        args.each { |arg| @notifiers[arg] = get_notifier(arg) }
-      end
-    end
+      return unless should_send?(opts[:if])
 
-    # TODO fix this. This is a quick and dirty patch for email
-    def user
-      @target.first
+      instance_eval(&block)
+      # create a notifier for each target
+      @targets.each do |target|
+        args.each do |name|
+          @notifiers << get_notifier(name, target)
+        end
+      end
     end
 
     # TODO !!! Watch out same payload for multiple notifers that
@@ -49,11 +51,10 @@ module Dallal
       opts[:persist].present?
     end
 
-    # TODO Add support for multiple targets
     def dispatch!
       validate!
-      @notifiers.each { |_, n| n.notify! }
-      @notifiers.each { |_, n| n.persist! } if persist?
+      @notifiers.each { |n| n.notify! }
+      @notifiers.each { |n| n.persist! } if persist?
     end
 
     private
@@ -68,9 +69,9 @@ module Dallal
       end
     end
 
-    def get_notifier(name)
-      # TODO Pass concrete notifications to notifiers. Ex, EmailNotification, JsonPayloadNotification, SmsNotification ...
-      Dallal::Notifiers::Notifier.send(name, self)
+    def get_notifier(name, target)
+      notification = "Dallal::Notifications::#{name.to_s.camelcase}Notification".constantize.new(self, target)
+      Dallal::Notifiers::Notifier.send(name, notification)
     end
 
     def should_send?(condition)

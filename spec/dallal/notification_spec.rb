@@ -33,7 +33,7 @@ describe Dallal::Notification do
         executed = true
       end
       expect(executed).to eq true
-      expect(subject.instance_variable_get(:@target)).to eq [@user]
+      expect(subject.instance_variable_get(:@targets)).to eq [@user]
     end
 
     context 'notify with nested with block' do
@@ -47,8 +47,8 @@ describe Dallal::Notification do
         end
         expect(executed).to be true
         expect(subject.instance_variable_get(:@template_name)).to eq :an_email_template
-        expect(subject.instance_variable_get(:@notifiers)[:email]).to be_a(Dallal::Notifiers::EmailNotifier)
-        expect(subject.instance_variable_get(:@target)).to eq([@user])
+        expect(subject.instance_variable_get(:@notifiers).first).to be_a(Dallal::Notifiers::EmailNotifier)
+        expect(subject.instance_variable_get(:@targets)).to eq([@user])
       end
 
       it 'evaluates correctly an sms block' do
@@ -59,8 +59,8 @@ describe Dallal::Notification do
         end
         expect(subject.instance_variable_get(:@template)).to eq nil
         expect(subject.instance_variable_get(:@payload)).to eq({a: 1, b: 2})
-        expect(subject.instance_variable_get(:@target)).to eq([@user])
-        expect(subject.instance_variable_get(:@notifiers)[:sms]).to be_a(Dallal::Notifiers::SmsNotifier)
+        expect(subject.instance_variable_get(:@targets)).to eq([@user])
+        expect(subject.instance_variable_get(:@notifiers).first).to be_a(Dallal::Notifiers::SmsNotifier)
       end
 
       it 'evaluates correctly when an if lambda returns true' do
@@ -75,8 +75,8 @@ describe Dallal::Notification do
           end
         end
         expect(subject.instance_variable_get(:@template_name)).to eq :an_email_template
-        expect(subject.instance_variable_get(:@notifiers)[:email]).to be_a(Dallal::Notifiers::EmailNotifier)
-        expect(subject.instance_variable_get(:@target)).to eq([@user])
+        expect(subject.instance_variable_get(:@notifiers).first).to be_a(Dallal::Notifiers::EmailNotifier)
+        expect(subject.instance_variable_get(:@targets)).to eq([@user])
       end
 
       it 'does not call the block when if lambda evaluates to false' do
@@ -92,13 +92,13 @@ describe Dallal::Notification do
           end
         end
         expect(subject.instance_variable_get(:@template_name)).to eq nil
-        expect(subject.instance_variable_get(:@notifiers)[:email]).to eq nil
-        expect(subject.instance_variable_get(:@target)).to eq nil
+        expect(subject.instance_variable_get(:@notifiers)).to be_empty
+        expect(subject.instance_variable_get(:@targets)).to eq nil
       end
     end
 
     context "multiple notifiers" do
-      it '' do
+      it 'fills properties correctly' do
         subject.notify(@user) do
           with :email do
             template :email_template
@@ -107,10 +107,11 @@ describe Dallal::Notification do
             payload a: 1, b: 2
           end
         end
-        expect(subject.instance_variable_get(:@notifiers)[:email]).to be_a(Dallal::Notifiers::EmailNotifier)
+        expect(subject.instance_variable_get(:@notifiers).size).to eq 2
+        expect(subject.instance_variable_get(:@notifiers).first).to be_a(Dallal::Notifiers::EmailNotifier)
         expect(subject.instance_variable_get(:@template_name)).to eq :email_template
         expect(subject.instance_variable_get(:@payload)).to eq(a: 1, b: 2)
-        expect(subject.instance_variable_get(:@notifiers)[:sms]).to be_a(Dallal::Notifiers::SmsNotifier)
+        expect(subject.instance_variable_get(:@notifiers).last).to be_a(Dallal::Notifiers::SmsNotifier)
       end
    end
   end
@@ -124,10 +125,9 @@ describe Dallal::Notification do
             template :a
           end
         end
-        expect(subject.instance_variable_get(:@notifiers)[:sms]).to be nil
-        expect(subject.instance_variable_get(:@notifiers)[:sms]).to be nil
-        expect(subject.instance_variable_get(:@notifiers)[:email]).to receive(:notify!)
-        expect(subject.instance_variable_get(:@notifiers)[:email]).to_not receive(:persist!)
+        expect(subject.instance_variable_get(:@notifiers).size).to eq 1
+        expect(subject.instance_variable_get(:@notifiers).first).to receive(:notify!)
+        expect(subject.instance_variable_get(:@notifiers).first).to_not receive(:persist!)
 
         subject.dispatch!
       end
