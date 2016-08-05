@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    dallal (0.1.1)
+    dallal (0.2.0)
       rails (~> 4.2.0)
 
 GEM
