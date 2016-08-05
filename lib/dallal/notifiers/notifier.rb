@@ -10,14 +10,6 @@ module Dallal
         @notification = notification
       end
 
-      def self.email(notification)
-        Dallal::Notifiers::EmailNotifier.new(notification)
-      end
-  
-      def self.sms(notification)
-        Dallal::Notifiers::SmsNotifier.new(notification)
-      end
-
       def notify!(*args)
         Notifier.api_not_implemented(self)
       end

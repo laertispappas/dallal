@@ -8,7 +8,6 @@ module Dallal
 
 
       def persist!
-
       end
     end
   end

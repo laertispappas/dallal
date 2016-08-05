@@ -4,7 +4,8 @@ require 'dallal/notifications/sms_notification'
 module Dallal
   class Notification
     attr_accessor :event, :model_class, :opts, :_object
-    attr_reader :template_name
+    attr_reader :targets
+    attr_reader :notifiers
 
     def initialize args = {}
       args.each do |k, v|
@@ -14,7 +15,6 @@ module Dallal
       @notifiers = []
     end
 
-    # TODO Collection of targets is not supported
     def notify *args, &block
       notify_opts = args.extract_options!
       return unless should_send?(notify_opts[:if])
@@ -27,24 +27,13 @@ module Dallal
       opts = args.extract_options!
       return unless should_send?(opts[:if])
 
-      instance_eval(&block)
       # create a notifier for each target
       @targets.each do |target|
         args.each do |name|
-          @notifiers << get_notifier(name, target)
+          notifier = get_notifier(name, target, &block)
+          @notifiers << notifier
         end
       end
-    end
-
-    # TODO !!! Watch out same payload for multiple notifers that
-    # require payload
-    def payload payload
-      @payload = payload
-    end
-
-    # Same here as payload
-    def template template
-      @template_name = template
     end
 
     def persist?
@@ -69,9 +58,10 @@ module Dallal
       end
     end
 
-    def get_notifier(name, target)
+    def get_notifier(name, target, &block)
       notification = "Dallal::Notifications::#{name.to_s.camelcase}Notification".constantize.new(self, target)
-      Dallal::Notifiers::Notifier.send(name, notification)
+      notification.instance_eval(&block)
+      notification.notifier
     end
 
     def should_send?(condition)
