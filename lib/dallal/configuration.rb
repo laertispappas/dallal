@@ -47,15 +47,15 @@ module Dallal
         self.user_class_name = 'User'
         self.dallal_class_name = 'Dallal'
         self.enabled = true
-        
+
         # Email config
         self.email_layout = 'mailer'
         self.from_email = 'foo@bar.xyz'
         self.from_name = 'just a name'
 
         # SMS config
-        self.twilio_account_id = 'YOUR TWILLIO ACCOUNT ID'
-        self.twilio_auth_token = 'TWILLIO_AUTH_TOKEN'
+        self.twilio_account_id = 'YOUR TWILIO ACCOUNT ID'
+        self.twilio_auth_token = 'TWILIO_AUTH_TOKEN'
         self.sms_from = 'Sender phone number'
       end
     end

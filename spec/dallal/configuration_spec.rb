@@ -45,7 +45,10 @@ describe Dallal::Configuration do
         enabled: true,
         email_layout: 'mailer',
         from_email: 'foo@bar.xyz',
-        from_name: 'just a name'
+        from_name: 'just a name',
+        twilio_account_id: 'YOUR TWILIO ACCOUNT ID',
+        twilio_auth_token: 'TWILIO_AUTH_TOKEN',
+        sms_from: 'Sender phone number',
       })
     end
   end
