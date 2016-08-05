@@ -26,8 +26,6 @@ And then execute:
 
     $ bundle install
 
-## Requirements
-TBD
 
 ## Usage
 Generate `dallal` configuration file:
@@ -85,9 +83,6 @@ above we need two templates under `app/views/dallal/mailer/polls/`:
 
 When a poll is created / updated a job will be enqueue to dispatch the notification. `dallal` implements
 active job so any supported queue mechanism should be working.
-
-## Development
-TBD
 
 ## Contributing
 
