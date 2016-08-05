@@ -1,9 +1,10 @@
 require "dallal/engine" if defined?(Rails)
+require 'dallal/configuration'
 require 'dallal/notification'
 require 'dallal/notifiers/notifier'
 require 'dallal/events/events'
-require 'dallal/configuration'
 require 'dallal/events/event_publisher'
+require 'twilio-ruby'
 
 module Dallal
   extend Configuration

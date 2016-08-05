@@ -27,13 +27,24 @@ describe Dallal::Notification do
       Dallal::Notification.new(event: :create, model_class: 'Post', opts: { a: 1 }, _object: @post)
     end
 
-    it 'should get the target(s) and call the block' do
+    it 'should get a single target and call the block' do
       executed = false
       subject.notify(@user) do
         executed = true
       end
       expect(executed).to eq true
       expect(subject.targets).to eq [@user]
+    end
+
+    it 'should get multiple target and call the block' do
+      executed = false
+      other = double("OtherUser")
+      subject.notify(@user, other) do
+        executed = true
+      end
+
+      expect(executed).to eq true
+      expect(subject.targets).to eq [@user, other]
     end
 
     context 'notify with nested with block' do
@@ -53,14 +64,18 @@ describe Dallal::Notification do
       end
 
       it 'evaluates correctly an sms block' do
+        subject.define_singleton_method(:post) {}
+        allow(subject).to receive(:post).and_return(@post)
         subject.notify(@user) do
           with :sms do
-            payload({ a:1, b: 2 })
+            message "Message #{post.user.email}"
+            recipient post.user.phone_number
           end
         end
         notifier = subject.notifiers.first
         expect(notifier).to be_a(Dallal::Notifiers::SmsNotifier)
-        expect(notifier.notification.sms_payload).to eq({a: 1, b: 2})
+        expect(notifier.notification.body).to eq("Message #{@post.user.email}")
+        expect(notifier.notification.to).to eq @post.user.phone_number
         expect(subject.targets).to eq([@user])
       end
 
@@ -103,12 +118,18 @@ describe Dallal::Notification do
 
     context "multiple notifiers" do
       it 'fills properties correctly' do
+        subject.define_singleton_method(:post) do
+          @post
+        end
+        allow(subject).to receive(:post).and_return(@post)
+
         subject.notify(@user) do
           with :email do
             template :email_template
           end
           with :sms do
-            payload a: 1, b: 2
+            message "Message #{post.user.email}"
+            recipient post.user.phone_number
           end
         end
         email_notifier = subject.notifiers.first
@@ -118,7 +139,8 @@ describe Dallal::Notification do
         expect(email_notifier).to be_a(Dallal::Notifiers::EmailNotifier)
         expect(email_notifier.notification.template_name).to eq :email_template
         expect(sms_notifier).to be_a(Dallal::Notifiers::SmsNotifier)
-        expect(sms_notifier.notification.sms_payload).to eq(a: 1, b: 2)
+        expect(sms_notifier.notification.body).to eq "Message #{@post.user.email}"
+        expect(sms_notifier.notification.to).to eq @post.user.phone_number
       end
    end
   end
@@ -139,11 +161,85 @@ describe Dallal::Notification do
         subject.dispatch!
       end
     end
-    context 'single email notification' do
+    context 'single email notification with persistance' do
       pending
     end
+
+    context 'single sms notification' do
+      it 'send an sms notification' do
+        subject.notify(@user) do
+          with :sms do
+            message "a message"
+          end
+        end
+
+        expect(subject.notifiers.size).to eq 1
+        expect(subject.notifiers.first).to receive(:notify!)
+        expect(subject.notifiers.first).to_not receive(:persist!)
+
+        subject.dispatch!
+      end
+    end
+
+    context 'single sms notification with persistance' do
+      pending
+    end
+
     context 'multiple notifications' do
       pending
+    end
+
+    context "multiple users to be notified" do
+      it 'sends an notification to each one of them' do
+        other = double("OtherUser")
+        subject.notify(@user, other) do
+          with :sms do
+            message 'a message'
+          end
+        end
+
+        expect(subject.notifiers.size).to eq 2
+        expect(subject.notifiers.first).to receive(:notify!)
+        expect(subject.notifiers.last).to receive(:notify!)
+        subject.dispatch!
+      end
+    end
+  end
+
+  describe "#with" do
+    pending
+  end
+
+  describe "#get_notifier" do
+    before do
+      subject.define_singleton_method(:post) {}
+      allow(subject).to receive(:post).and_return(@post)
+    end
+    context "sms notification" do
+      context "when recipient is defined" do
+        it 'creates a notification and return an sms notifier' do
+          blk = proc { message "a message"; recipient post.user }
+          notifier = subject.send(:get_notifier, :sms, @user, &blk)
+          expect(notifier).to be_a Dallal::Notifiers::SmsNotifier
+          notification = notifier.notification
+          expect(notification.target).to eq @user
+          expect(notification.body).to eq "a message"
+          expect(notification.to).to eq @post.user
+          expect(notification.from).to eq Dallal.configuration.sms_from
+        end
+      end
+      context "when recipient is not defined" do
+        it 'gets the number from target user' do
+          blk = proc { message "a message" }
+          notifier = subject.send(:get_notifier, :sms, @user, &blk)
+          expect(notifier).to be_a Dallal::Notifiers::SmsNotifier
+          notification = notifier.notification
+          expect(notification.target).to eq @user
+          expect(notification.body).to eq "a message"
+          expect(notification.to).to eq @post.user.phone_number
+          expect(notification.from).to eq Dallal.configuration.sms_from
+        end
+      end
     end
   end
 

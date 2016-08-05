@@ -2,8 +2,9 @@ require 'ostruct'
 
 module Dallal
   module Configuration
-    CURRENT_ATTRS = [:user_class_name, :dallal_class_name,
-                     :enabled, :email_layout, :from_email, :from_name].freeze
+    CURRENT_ATTRS = [:user_class_name, :dallal_class_name, :enabled,
+                     :email_layout, :from_email, :from_name,
+                     :twilio_account_id, :twilio_auth_token, :sms_from].freeze
     DEPRECATED_ATTRS = [].freeze
     CONFIG_ATTRS = (CURRENT_ATTRS + DEPRECATED_ATTRS).freeze
 
@@ -42,12 +43,20 @@ module Dallal
 
       private
       def set_default_values
+        # App config
         self.user_class_name = 'User'
         self.dallal_class_name = 'Dallal'
         self.enabled = true
+        
+        # Email config
         self.email_layout = 'mailer'
         self.from_email = 'foo@bar.xyz'
         self.from_name = 'just a name'
+
+        # SMS config
+        self.twilio_account_id = 'YOUR TWILLIO ACCOUNT ID'
+        self.twilio_auth_token = 'TWILLIO_AUTH_TOKEN'
+        self.sms_from = 'Sender phone number'
       end
     end
   end
