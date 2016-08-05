@@ -23,7 +23,7 @@ describe Dallal::Events::Observer do
       expect(subject.callbacks.size).to eq 0
       executed = false
 
-      subject.on :create, a: 1, b: 2 do
+      subject.on :create, {a: 2, b: 2} do
         executed = true
       end
 
@@ -31,8 +31,35 @@ describe Dallal::Events::Observer do
       expect(subject.callbacks.size).to eq 1
       callback = subject.callbacks[0]
       expect(callback[:on]).to eq([:create])
-      expect(callback[:opts]).to eq({a: 1, b: 2})
+      expect(callback[:opts]).to eq({a: 2, b: 2})
       expect(callback[:block]).to be_a(Proc)
+    end
+    context 'multiple definitions' do
+      before { subject.instance_variable_set(:@__notification_callbacks, []) }
+      it 'append all definitions to callbacks' do
+        first_executed = false
+        second_executed = false
+        subject.on :create, a: 1 do
+          first_executed = true
+        end
+
+        subject.on :create, b: 2 do
+          second_executed = true
+        end
+
+        expect(first_executed).to be false
+        expect(second_executed).to be false
+        expect(subject.callbacks.size).to eq 2
+        first_callback = subject.callbacks.first
+        second_callback = subject.callbacks.last
+        expect(first_callback[:on]).to eq [:create]
+        expect(first_callback[:opts]).to eq a: 1
+        expect(first_callback[:block]).to be_a Proc
+
+        expect(second_callback[:on]).to eq [:create]
+        expect(second_callback[:opts]).to eq b: 2
+        expect(second_callback[:block]).to be_a Proc
+      end
     end
   end
 
@@ -90,6 +117,28 @@ describe Dallal::Events::Observer do
           subject.create_notification(id: @user.id, event: :update)
 
           expect(notification.user).to eq @user 
+        end
+      end
+
+      context "mutliple events" do
+        before { subject.instance_variable_set(:@__notification_callbacks, []) }
+        it 'calls all events' do
+          first_executed = false
+          second_executed = false
+
+          subject.on :create, a: 1 do
+            first_executed = true
+          end
+
+          subject.on :create, b: 2 do
+            second_executed = true
+          end
+
+          notification = double('Dallal::Notification')
+          expect(Dallal::Notification).to receive(:new).with(event: :create, model_class: 'User', opts: { a: 1 }, _object: @user).and_return(notification)
+          expect(Dallal::Notification).to receive(:new).with(event: :create, model_class: 'User', opts: { b: 2 }, _object: @user).and_return(notification)
+          expect(notification).to receive(:dispatch!).exactly(2).times
+          subject.create_notification(id: @user.id, event: :create)
         end
       end
     end
