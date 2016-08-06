@@ -1,5 +1,6 @@
 require 'dallal/notifications/email_notification'
 require 'dallal/notifications/sms_notification'
+require 'dallal/notifications/api_notification'
 
 module Dallal
   class Notification
@@ -66,12 +67,17 @@ module Dallal
 
     def should_send?(condition)
       return true if condition.blank?
+      return condition if bool?(condition)
 
       if condition.is_a?(Proc)
         instance_exec(&condition)
       else
         _object.send(condition)
       end
+    end
+
+    def bool?(condition)
+      false
     end
   end
 end

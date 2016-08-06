@@ -21,8 +21,6 @@ module Dallal
       end
 
       # TODO Rethink this. Currently one worker executes all notifications
-      # rethink moving to multiple concrete notifications so
-      # we can have one worker per notification.
       def self.create_notification(id:, event:)
         # TODO This loops on all callbacks. Rethink this
         # method and implement it differently. Add listeners?

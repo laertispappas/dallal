@@ -23,3 +23,4 @@ end
 
 require 'dallal/notifiers/email_notifier'
 require 'dallal/notifiers/sms_notifier'
+require 'dallal/notifiers/api_notifier'
