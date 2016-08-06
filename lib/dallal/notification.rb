@@ -42,16 +42,16 @@ module Dallal
 
     def dispatch!
       validate!
-      @notifiers.each { |n| n.notify! }
+      @notifiers.each do |notifier|
+        # notifier.validate!
+        notifier.notify!
+      end
       @notifiers.each { |n| n.persist! } if persist?
     end
 
     private
     # TODO Implement this
-    # when target is nil throw error
-    # on email notification when template is nil throw error
-    # on sms notification when payload is nil throw an error
-    # on any other notifiers add a validation logic here
+    # Add validation logic here
     def validate!
       if false
         raise "You have not defined \'notify\' in \'with\' block for #{class_name} notifier"
