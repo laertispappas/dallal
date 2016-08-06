@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    dallal (0.3.0)
+    dallal (0.3.1)
       rails (~> 4.2.0)
       twilio-ruby (~> 4.0)
 
