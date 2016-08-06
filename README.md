@@ -173,6 +173,7 @@ The gem is available as open source under the terms of the
 [MIT License](http://opensource.org/licenses/MIT).
 
 ## TODO
+* Add support for synchronous notifications
 * Refactor code to not require all files by default. Currently a user might
 interested in email notifications only but for the time being we require sms files also
 and most important we use twilio-rb gem.
