@@ -34,7 +34,7 @@ Generate `dallal` configuration file:
 
 This will create a file under `config/initializers/dallal.rb`. Change `dallal.rb` to your specific config settings.
 
-Require 'Dallal' in the resource that you need to publish notifications for.
+Include `Dallal` in the resource that you need to publish notifications for.
 For example given a polling app:
 
 ```ruby
@@ -73,24 +73,44 @@ end
 ```
 
 Email templates should live under `app/views/dallal/mailer/{resources}/` were resources is the
-plural name of the resource. Every actions requires `two` email templates in order to be sent.
+plural name of the resource. Every template requires `two` email templates in order to be sent.
 * The email subject template
 * The email text body itself
 
 By convention subject template should have the template name + the `_subject` postfix. For the
 poll example above we need two templates under `app/views/dallal/mailer/polls/`:
 
-* poll_created_subject.text.erb
-* poll_created_subject.html.erb
+* poll_created_subject.text.erb (Email subject)
+* poll_created.html.erb (email body)
+
+Inside those templates you have access to an `@notification` instance variable . `@notification`
+provides methods to access the resource and the target that the notification is sent to. For the
+`PollNotifier` above we will have access to `@notification.poll` and `@notification.target` (poll.author).
+
+Following our poll notifier for `poll_created` template we must have the following erb templates.
+
+```ruby
+--- file: app/views/dallal/mailer/polls/poll_created.html.erb`
+# This is the email body text
+<h3>Hello <%= @notification.target.full_name %></h3>
+
+Your new Poll <%= @notification.poll.title %> is created.
+```
+
+```ruby
+--- file: app/views/dallal/mailer/polls/poll_created_subject.text.erb`
+# This is the email subject text
+New Poll: <%= @notification.poll.title %>
+```
 
 When a poll is created / updated a job will be enqueue to dispatch the notification. `dallal`
 implements active job so any supported queue mechanism should be working.
 
 ## SMS Notifications
 In order to send an sms notification you need to have a Twilio account. You also need to provide
-your account id and auth token in `dallal.rb` initializer.
+your `account id`, `auth token` your twilio phone number in `dallal.rb` initializer.
 
-Creating a `UserNotifier` to send a sms notification:
+Creating a `UserNotifier` to send sms notifications:
 
 ```ruby
 --- file app/notifiers/user_notifier.rb
@@ -108,13 +128,13 @@ end
 ```
 If a recipient is not provided `dallal` will try to get the number from `user.phone_number`. If
 user does not respond to phone_number an exception will be raised and job will fail. So make sure
-that you provide a recipient or that your resource you are sending to implements `#phone_number`
+that you provide a recipient or that the resource you are sending to implements `#phone_number`
 and returns a valid cellphone number.
 
 
 ## Multiple notifications for an event
 You can send multiple notifications for a single event by defining `with` block multiple times.
-You can also supply notify block as many times you need for an event
+You can also supply notify block as many times as you need for an event
 ```ruby
 --- file app/notifiers/poll_notifier.rb
 class PollNotifier < Dallal::Events::Observer
@@ -153,6 +173,9 @@ The gem is available as open source under the terms of the
 [MIT License](http://opensource.org/licenses/MIT).
 
 ## TODO
+* Refactor code to not require all files by default. Currently a user might
+interested in email notifications only but for the time being we require sms files also
+and most important we use twilio-rb gem.
 * Clear out all TODO that exist in the code base
 * Write a script to auto generate `dallal.rb` initializer based on available config options.
 Currently every time we add a new config attribute we need to update the generator as well.
@@ -162,7 +185,7 @@ Currently every time we add a new config attribute we need to update the generat
 * Add support to persist notifications
 * Finish generators to create corresponding models and migrations
 * Add the option to persist notification on Notifiers
-* Add other mean of notification support like SMS / Push notifications / Action Cable etc
+* Add other mean of notification support like Push notifications / Action Cable etc
 
 
 
