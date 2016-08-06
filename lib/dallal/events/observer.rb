@@ -26,6 +26,7 @@ module Dallal
       def self.create_notification(id:, event:)
         # TODO This loops on all callbacks. Rethink this
         # method and implement it differently. Add listeners?
+        # Change callbacks data structure
         callbacks.each do |callback|
           next unless callback[:on].include?(event)
           obj = model_class.constantize.find(id)

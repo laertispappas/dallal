@@ -17,6 +17,7 @@ describe Dallal::Events::EventSubscriber do
   end
 
   context 'when a create event is broadcasted' do
+    # Failes randomly
     it 'creates a new instance and executes' do
       # save the user
       user.save!

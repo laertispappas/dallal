@@ -116,7 +116,7 @@ describe Dallal::Notification do
       end
     end
 
-    context "multiple notifiers" do
+    context "multiple types" do
       it 'fills properties correctly' do
         subject.define_singleton_method(:post) do
           @post
@@ -142,7 +142,38 @@ describe Dallal::Notification do
         expect(sms_notifier.notification.body).to eq "Message #{@post.user.email}"
         expect(sms_notifier.notification.to).to eq @post.user.phone_number
       end
-   end
+    end
+
+    context "multiple #notify blocks" do
+      before do
+        subject.define_singleton_method(:post) do
+          @post
+        end
+        allow(subject).to receive(:post).and_return(@post)
+      end
+      it 'evaluates multiple efinitions of notify' do
+        subject.notify(@user) do
+          with :email do
+            template :a_template
+          end
+        end
+
+        second_user = double("SecondUser")
+        subject.notify(second_user) do
+          with :email do
+            template :b_template
+          end
+        end
+
+        expect(subject.notifiers.size).to eq 2
+        first = subject.notifiers[0]
+        expect(first.notification.target).to eq @user
+        expect(first.notification.template_name).to eq :a_template
+        second = subject.notifiers[1]
+        expect(second.notification.target).to eq second_user
+        expect(second.notification.template_name).to eq :b_template
+      end
+    end
   end
 
   describe 'dispatch!' do

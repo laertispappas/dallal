@@ -8,11 +8,11 @@ Version](https://badge.fury.io/rb/dallal.svg)](https://badge.fury.io/rb/dallal)
 `dallal` is a Rails engine that adds notification capabilities to Rails projects.
 The scope of this engine is to provide a simple DSL to create `Notifier` classes that acts
 as observers on different events that are published from the application. For the time being
-`dallal` supports only email notifications and subscribes to `create` and `update` events of a resource
+`dallal` supports only email and sms notifications and subscribes to `create` and `update` events of a resource
 without allowing any custom events to be emitted. (see TODO list in the end for future features).
 
 ## Supported Notification Types
-Currently `Dallal` supports only email notifications.
+Currently `Dallal` supports email notifications and sms notifications using Twilio REST services.
 
 ## Installation
 
@@ -46,6 +46,8 @@ when included all `create` and `update` events of a poll will be published. In o
 events, we need to create the corresponding `PollNotifier` under `app/notifiers/poll_notifier.rb`.
 Keep in mind that for the time being location matters and the name must keep the convention of `resource_notifier`.
 
+## Email Notifications
+
 Creating a `PollNotifier` to send an email:
 
 ```ruby
@@ -61,7 +63,7 @@ class PollNotifier < Dallal::Events::Observer
   end
 
   on :update do
-    notify poll.author, if: ->() { poll.published } do
+    notify poll.author, if: ->() { poll.published? } do
         with :email do
             template :poll_published
         end
@@ -75,14 +77,66 @@ plural name of the resource. Every actions requires `two` email templates in ord
 * The email subject template
 * The email text body itself
 
-By convention subject template should have the template name + the `_subject` postfix. For the poll example
-above we need two templates under `app/views/dallal/mailer/polls/`:
+By convention subject template should have the template name + the `_subject` postfix. For the
+poll example above we need two templates under `app/views/dallal/mailer/polls/`:
 
 * poll_created_subject.text.erb
 * poll_created_subject.html.erb
 
-When a poll is created / updated a job will be enqueue to dispatch the notification. `dallal` implements
-active job so any supported queue mechanism should be working.
+When a poll is created / updated a job will be enqueue to dispatch the notification. `dallal`
+implements active job so any supported queue mechanism should be working.
+
+## SMS Notifications
+In order to send an sms notification you need to have a Twilio account. You also need to provide
+your account id and auth token in `dallal.rb` initializer.
+
+Creating a `UserNotifier` to send a sms notification:
+
+```ruby
+--- file app/notifiers/user_notifier.rb
+
+class UserNotifier < Dallal::Events::Observer
+  on :create do
+    notify user do
+        with :sms do
+            message "Your code: #{user.generate_some_code}"
+            recipient user.profile.phone_number
+        end
+    end
+  end
+end
+```
+If a recipient is not provided `dallal` will try to get the number from `user.phone_number`. If
+user does not respond to phone_number an exception will be raised and job will fail. So make sure
+that you provide a recipient or that your resource you are sending to implements `#phone_number`
+and returns a valid cellphone number.
+
+
+## Multiple notifications for an event
+You can send multiple notifications for a single event by defining `with` block multiple times.
+You can also supply notify block as many times you need for an event
+```ruby
+--- file app/notifiers/poll_notifier.rb
+class PollNotifier < Dallal::Events::Observer
+  on :update do
+    notify poll.author, if: :published do
+        with :email do
+            template :published
+        end
+        with :sms do
+            message "Your poll is published."
+            recipient poll.author.profile.phone_number
+        end
+    end
+
+    notify poll.users_interested do
+        with :email do
+            template :user_interested
+        end
+    end
+  end
+end
+```
 
 ## Contributing
 
@@ -103,11 +157,11 @@ The gem is available as open source under the terms of the
 * Write a script to auto generate `dallal.rb` initializer based on available config options.
 Currently every time we add a new config attribute we need to update the generator as well.
 * Add support for custom events. Drop active record callbacks.
-** Remove auto generated events: `create` and `update`
-** Refactor `Publisher` and `Subscriber` modules.
+* Remove auto generated events: `create` and `update`
+* Refactor `Publisher` and `Subscriber` modules.
 * Add support to persist notifications
-** Finish generators to create corresponding models and migrations
-** Add the option to persist notification on Notifiers
+* Finish generators to create corresponding models and migrations
+* Add the option to persist notification on Notifiers
 * Add other mean of notification support like SMS / Push notifications / Action Cable etc
 
 
