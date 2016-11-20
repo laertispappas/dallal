@@ -18,7 +18,7 @@ Gem::Specification.new do |s|
   s.test_files = Dir["spec/**/*"]
   s.required_ruby_version = '>= 2.1.0' # for mandatory method keyword arguments
 
-  s.add_dependency "rails", "~> 4.2.0"
+  s.add_dependency "rails", ">= 4"
   s.add_dependency "twilio-ruby", '~> 4.0'
   s.add_dependency "rest-client"
 
